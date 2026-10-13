@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CampusFlow AI</title>
+<style>
+:root{
+--bg:#ede5d7;--card:#f1eadd;--ink:#26302f;--mut:#7b7466;--line:#ddd3bf;
+--acc:#0f5757;--acc2:#0b4444;
+--ok:#0f5757;--warn:#8a5a0b;--bad:#a23a2b;--okb:#d6e5de;--warnb:#f0e1be;--badb:#f2d6cf;
+--hi:rgba(255,252,243,.95);--lo:rgba(186,172,142,.55);
+--raise:6px 6px 14px var(--lo),-6px -6px 14px var(--hi);
+--raise-s:3px 3px 8px var(--lo),-3px -3px 8px var(--hi);
+--inset:inset 3px 3px 7px var(--lo),inset -3px -3px 7px var(--hi);
+--press:inset 4px 4px 9px rgba(160,146,118,.6),inset -3px -3px 7px var(--hi);
+color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,"Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+main{max-width:1000px;margin:0 auto;padding:22px 18px 40px}
+h1{font-size:22px;margin:0;letter-spacing:.3px;text-transform:uppercase;font-weight:700}
+h2{font-size:12px;margin:0 0 12px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.sub{color:var(--mut);margin:4px 0 20px}
+label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--mut)}
+nav{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap;padding:6px;border-radius:16px;background:var(--card);box-shadow:var(--raise-s);width:fit-content;max-width:100%}
+nav button,.btn{border:0;background:var(--card);color:var(--ink);padding:9px 18px;border-radius:99px;cursor:pointer;font:inherit;font-weight:600;box-shadow:var(--raise-s);transition:box-shadow .15s,transform .05s}
+nav button{box-shadow:none;background:transparent;border-radius:12px;color:var(--mut)}
+nav button.on{background:var(--card);color:var(--acc);box-shadow:var(--press)}
+.btn:hover{box-shadow:4px 4px 10px var(--lo),-4px -4px 10px var(--hi)}
+.btn:active{box-shadow:var(--press);transform:translateY(1px)}
+.btn.pri{background:linear-gradient(180deg,#136666,var(--acc2));color:#fff;box-shadow:3px 4px 10px rgba(11,68,68,.38),-3px -3px 8px var(--hi)}
+.btn.pri:active{box-shadow:inset 3px 3px 8px rgba(0,0,0,.4)}
+.btn.sm{padding:4px 12px;font-size:12.5px}
+.card{background:var(--card);border-radius:22px;padding:18px;margin-bottom:20px;box-shadow:var(--raise)}
+.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+canvas{width:100%;height:auto;border-radius:16px;cursor:crosshair;background:#2a2d3d;display:block;box-shadow:var(--inset);border:5px solid var(--card)}
+.stat{font-size:36px;font-weight:700;line-height:1.1;color:var(--acc)}
+.pill{display:inline-block;padding:2px 12px;border-radius:99px;font-size:12px;font-weight:700;box-shadow:var(--raise-s)}
+.light,.OK{background:var(--okb);color:var(--ok)}.moderate,.Reorder{background:var(--warnb);color:var(--warn)}.busy,.Critical{background:var(--badb);color:var(--bad)}
+.note{font-size:13px;color:var(--mut)}
+.alert{padding:11px 14px;border-radius:14px;margin:10px 0;font-size:14px;box-shadow:var(--inset)}
+.tablewrap{overflow-x:auto;border-radius:16px;padding:4px 4px 8px}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:720px;background:var(--card);border-radius:16px;box-shadow:var(--raise-s)}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+th{color:var(--ink);font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+input[type=number],input[type=text],input[type=password],select{padding:8px 12px;border:2px solid transparent;border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;box-shadow:var(--inset);outline:0;transition:border-color .15s}
+input:focus,select:focus{border-color:var(--acc)}
+input[type=number]{width:78px}input[type=text]{width:140px}
+input[type=file]{font-size:13px;color:var(--mut)}
+input[type=file]::file-selector-button{border:0;background:var(--card);color:var(--ink);padding:8px 14px;border-radius:99px;margin-right:8px;font:inherit;font-weight:600;cursor:pointer;box-shadow:var(--raise-s)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.hide{display:none}
+ul{margin:6px 0;padding-left:20px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.login{max-width:420px;margin:28px auto}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.roles .btn{padding:12px;border-radius:16px}
+.roles .btn.on{background:var(--card);color:var(--acc);box-shadow:var(--press)}
+input.w,select.w{width:100%;margin:4px 0 12px}
+#plan .alert,#sum .alert{border-left:4px solid var(--acc)}
+</style></head><body><main>
+<div class="top"><h1>CampusFlow AI</h1><div id="who" class="hide"><span id="whot" class="note"></span> <button class="btn sm" id="out">Log out</button></div></div>
+<p class="sub">See the queue. Prepare the stock. A decision-support prototype for canteen staff, with demo data.</p>
+<section id="login" class="card login"><h2>Log in</h2>
+<div class="roles"><button class="btn on" data-r="student">Student / customer</button><button class="btn" data-r="staff">Staff / supervisor</button></div>
+<label for="un">Your name</label><input class="w" type="text" id="un" placeholder="e.g. Ragul">
+<div id="pinw" class="hide"><label for="pin">Staff PIN</label><input class="w" type="password" id="pin" placeholder="PIN"></div>
+<div id="lerr"></div><button class="btn pri" id="go">Continue</button>
+<p class="note">Demo login: the staff PIN is 1234. This runs in your browser only, so it is not real security.</p></section>
+
+<section id="stu" class="hide">
+<div class="grid">
+<div class="card"><h2>Canteen queue right now</h2><div id="sq"></div><div class="row"><button class="btn sm" id="sref">Refresh</button></div></div>
+<div class="card"><h2>Plan my visit</h2><label for="sel">I want to get</label><select class="w" id="sel"></select><div id="plan"></div></div>
+</div>
+<div class="card"><h2>What is available</h2><div id="menu"></div></div>
+<p class="note">Queue and availability are posted by canteen staff. All estimates are approximate.</p>
+</section>
+
+<div id="staff" class="hide"><nav id="nav"><button data-t="q" class="on">Queue view</button><button data-t="i">Inventory view</button><button data-t="c">Combined view</button></nav>
+
+<section id="t-q">
+<div class="grid">
+<div class="card">
+<h2>Queue image</h2>
+<div class="row">
+<input type="file" id="file" accept="image/*">
+<button class="btn" id="sample">Load sample scan</button>
+<button class="btn" id="clear">Clear marks</button>
+</div>
+<canvas id="cv" width="640" height="400"></canvas>
+<p class="note" id="hint">Upload a permitted queue photo, then click each visible person to mark them. Click a marker again to remove it. Nothing is uploaded or stored: the image stays in your browser.</p>
+</div>
+<div class="card">
+<h2>Estimate</h2>
+<div class="stat" id="cnt">0</div><div class="note">people in queue</div>
+<div class="row"><label for="rate">Service rate (people/min)</label><input type="number" id="rate" value="2.5" min="0.1" step="0.1"></div>
+<div class="stat" id="wait">-</div><div class="note" id="calc">Mark people to see a wait estimate.</div>
+<p><span class="pill light" id="qs">No scan</span></p>
+<div class="note" id="src"></div>
+<div class="note" id="ts"></div>
+<div id="warn"></div>
+</div>
+</div>
+<div class="card note"><b>Why no live YOLO here?</b> A hosted page can't download a detection model, so this build follows the deck's fallback plan: manual marking, or a sample scan that is labelled as sample data. The count-to-wait logic is the real formula: people ÷ service rate.</div>
+</section>
+
+<section id="t-i" class="hide">
+<div class="card">
+<h2>Inventory &amp; reorder advisor</h2>
+<p class="note">Reorder point = daily sales × lead time (days) + safety stock. Suggested order tops stock up to reorder point + one day of sales. Edit any number; it recalculates when you leave the field.</p>
+<div class="tablewrap"><table><thead><tr><th>Item</th><th>Stock</th><th>Daily sales</th><th>Lead (days)</th><th>Safety</th><th>Reorder pt</th><th>Status</th><th>Suggest</th><th>Sold today</th><th>Actions</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="row"><input type="text" id="nn" placeholder="New item name"><input type="number" id="ns" placeholder="Stock" min="0"><input type="number" id="nd" placeholder="Daily" min="0"><input type="number" id="nl" placeholder="Lead" min="0"><input type="number" id="nf" placeholder="Safety" min="0"><button class="btn" id="add">Add item</button></div>
+<div class="row"><button class="btn" id="rush">Simulate rush period</button><button class="btn" id="reset">Reset demo data</button></div>
+</div>
+<div class="card"><h2>Recent activity</h2><ul id="log"><li class="note">No activity yet.</li></ul></div>
+</section>
+
+<section id="t-c" class="hide">
+<div class="card"><h2>Action summary</h2><div id="sum"></div></div>
+<div class="grid">
+<div class="card"><h2>Queue status</h2><div id="cq"></div></div>
+<div class="card"><h2>Stock alerts</h2><div id="ca"></div></div>
+</div>
+<div class="card"><h2>Assumptions &amp; limits</h2><ul class="note">
+<li>Queue size is a rush-period signal, not a measurement of item sales.</li>
+<li>Wait time assumes a steady service rate; real waits vary with image quality and queue boundaries.</li>
+<li>No facial recognition. Images are not retained.</li>
+<li>Demo data is illustrative. Staff stay in control of every decision.</li></ul></div>
+</section>
+</div>
+
+<script>
+(function(){
+var DEF=[{n:"Veg Samosa",s:12,d:10,l:3,f:10,sold:0},{n:"Masala Dosa portions",s:30,d:18,l:1,f:6,sold:0},{n:"Filter Coffee cups",s:70,d:40,l:1,f:10,sold:0},{n:"Veg Fried Rice portions",s:15,d:20,l:2,f:8,sold:0}];
+var items=JSON.parse(JSON.stringify(DEF)),marks=[],bg=null,source=null,scanTime=null,logs=[];
+var $=function(i){return document.getElementById(i)},cv=$("cv"),cx=cv.getContext("2d");
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function num(v,def){v=parseFloat(v);return isFinite(v)&&v>=0?v:def}
+function rop(i){return i.d*i.l+i.f}
+function status(i){return i.s<=i.f?"Critical":i.s<=rop(i)?"Reorder":"OK"}
+function sugg(i){return status(i)==="OK"?0:Math.max(0,Math.ceil(rop(i)+i.d-i.s))}
+function log(m){logs.unshift(new Date().toLocaleTimeString()+" - "+m);logs=logs.slice(0,8)}
+function rate(){var r=parseFloat($("rate").value);return isFinite(r)&&r>0?r:2.5}
+function qstat(n){return n<5?"light":n<10?"moderate":"busy"}
+function qlabel(n){return n===0&&!source?"No scan":{light:"Light queue",moderate:"Moderate queue",busy:"Busy queue"}[qstat(n)]}
+
+/* queue canvas */
+function draw(){
+cx.clearRect(0,0,640,400);
+if(bg){var r=Math.min(640/bg.width,400/bg.height),w=bg.width*r,h=bg.height*r;cx.fillStyle="#222";cx.fillRect(0,0,640,400);cx.drawImage(bg,(640-w)/2,(400-h)/2,w,h)}
+else{cx.fillStyle="#2a2d3d";cx.fillRect(0,0,640,400);cx.fillStyle="#9aa0bd";cx.font="16px sans-serif";cx.textAlign="center";cx.fillText("Upload an image or load the sample scan",320,200)}
+marks.forEach(function(m,k){var x=m.x*640,y=m.y*400;cx.strokeStyle="#22c55e";cx.lineWidth=2;cx.strokeRect(x-14,y-14,28,28);cx.fillStyle="#22c55e";cx.fillRect(x-14,y-28,28,14);cx.fillStyle="#000";cx.font="bold 11px sans-serif";cx.textAlign="center";cx.fillText(k+1,x,y-17)})}
+function sampleBg(){
+var o=document.createElement("canvas");o.width=640;o.height=400;var c=o.getContext("2d");
+c.fillStyle="#d9d4c7";c.fillRect(0,0,640,400);c.fillStyle="#8a7f6a";c.fillRect(0,300,640,100);c.fillStyle="#5b6b8c";c.fillRect(0,20,640,50);
+c.fillStyle="#fff";c.font="bold 18px sans-serif";c.fillText("CANTEEN COUNTER (sample illustration)",20,52);
+var pts=[];for(var k=0;k<12;k++){var x=50+k*47,y=200+(k%3)*28;pts.push({x:x/640,y:(y-34)/400});
+c.fillStyle=["#c0392b","#2980b9","#27ae60","#8e44ad","#d35400","#16a085"][k%6];c.fillRect(x-12,y-18,24,46);
+c.fillStyle="#f1c9a5";c.beginPath();c.arc(x,y-28,10,0,6.3);c.fill()}
+return{canvas:o,pts:pts}}
+function renderQ(){
+var n=marks.length,w=n/rate();draw();
+$("cnt").textContent=n;
+if(!source){$("wait").textContent="-";$("calc").textContent="Mark people to see a wait estimate."}
+else{$("wait").textContent="about "+Math.max(n?1:0,Math.round(w))+" min";$("calc").textContent=n+" people ÷ "+rate()+" people/min = "+w.toFixed(1)+" min"}
+var q=$("qs");q.textContent=qlabel(n);q.className="pill "+(source?qstat(n):"light");
+$("src").textContent=source==="sample"?"Source: SAMPLE result (illustration, not live detection)":source==="manual"?"Source: manual marks on your image":"";
+$("ts").textContent=scanTime?"Scan time: "+scanTime.toLocaleString():"";
+var wn="";if(source==="manual"&&n===0)wn="No people marked yet. The estimate is not reliable until you mark the queue.";
+else if(source&&n>0&&rate()<1)wn="Very low service rate set: the wait estimate may be pessimistic.";
+$("warn").innerHTML=wn?'<div class="alert" style="background:var(--warnb);color:var(--warn)">'+wn+'</div>':"";
+save();snap();renderC()}
+function stamp(){scanTime=new Date()}
+cv.addEventListener("click",function(e){
+if(!source)return;if(source==="sample"){source="manual";bg=bg;}
+var b=cv.getBoundingClientRect(),x=(e.clientX-b.left)/b.width,y=(e.clientY-b.top)/b.height;
+for(var k=0;k<marks.length;k++){if(Math.abs(marks[k].x-x)*640<16&&Math.abs(marks[k].y-y)*400<16){marks.splice(k,1);stamp();renderQ();return}}
+marks.push({x:x,y:y});stamp();renderQ()});
+$("file").addEventListener("change",function(e){var f=e.target.files[0];if(!f)return;
+var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){bg=im;marks=[];source="manual";stamp();renderQ()};im.src=rd.result};rd.readAsDataURL(f)});
+$("sample").onclick=function(){var s=sampleBg();bg=s.canvas;marks=s.pts;source="sample";stamp();renderQ()};
+$("clear").onclick=function(){marks=[];if(source)stamp();renderQ()};
+$("rate").addEventListener("input",renderQ);
+
+/* inventory */
+function renderI(){
+var h="";items.forEach(function(i,k){var st=status(i);
+h+="<tr><td>"+esc(i.n)+"</td>"+["s","d","l","f"].map(function(f){return '<td><input type="number" min="0" data-k="'+k+'" data-f="'+f+'" value="'+i[f]+'"></td>'}).join("")+
+"<td>"+rop(i)+"</td><td><span class='pill "+st+"'>"+st+"</span></td><td>"+(sugg(i)||"-")+"</td><td>"+i.sold+"</td>"+
+'<td><button class="btn sm" data-a="s1" data-k="'+k+'">Sell 1</button> <button class="btn sm" data-a="s5" data-k="'+k+'">Sell 5</button> <button class="btn sm" data-a="rc" data-k="'+k+'">Receive order</button> <button class="btn sm" data-a="rm" data-k="'+k+'">Remove</button></td></tr>'});
+$("tb").innerHTML=h||'<tr><td colspan="10" class="note">No items. Add one below.</td></tr>';
+$("log").innerHTML=logs.length?logs.map(function(l){return"<li>"+esc(l)+"</li>"}).join(""):'<li class="note">No activity yet.</li>'}
+function sell(i,q){var a=Math.min(q,i.s);i.s-=a;i.sold+=a;if(a<q)log(i.n+": only "+a+" left, sold out");else log("Sold "+a+" x "+i.n)}
+$("tb").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var i=items[b.dataset.k],a=b.dataset.a;
+if(a==="s1")sell(i,1);else if(a==="s5")sell(i,5);
+else if(a==="rc"){var q=sugg(i);if(!q){log(i.n+": no order needed");}else{i.s+=q;log("Received "+q+" x "+i.n)}}
+else if(a==="rm"){log("Removed "+i.n);items.splice(b.dataset.k,1)}
+renderAll()});
+$("tb").addEventListener("change",function(e){var t=e.target;if(!t.dataset.f)return;var i=items[t.dataset.k];i[t.dataset.f]=num(t.value,i[t.dataset.f]);renderAll()});
+$("add").onclick=function(){var n=$("nn").value.trim();if(!n){$("nn").focus();return}
+items.push({n:n,s:num($("ns").value,0),d:num($("nd").value,0),l:num($("nl").value,1),f:num($("nf").value,0),sold:0});
+["nn","ns","nd","nl","nf"].forEach(function(x){$(x).value=""});log("Added "+n);renderAll()};
+$("rush").onclick=function(){items.forEach(function(i){var q=Math.round(i.d*0.4);if(q>0)sell(i,q)});log("Rush period simulated (about 40% of daily sales)");renderAll()};
+$("reset").onclick=function(){items=JSON.parse(JSON.stringify(DEF));logs=[];renderAll()};
+
+/* combined */
+function renderC(){
+var n=marks.length,low=items.filter(function(i){return status(i)!=="OK"}),q=qstat(n),names=low.map(function(i){return esc(i.n)}).join(", ");
+$("cq").innerHTML=source?'<div class="stat">'+n+'</div><div class="note">people, about '+Math.round(n/rate())+' min wait</div><p><span class="pill '+q+'">'+qlabel(n)+'</span></p><div class="note">'+(source==="sample"?"Sample result":"Manual marks")+"</div>":'<p class="note">No queue scan yet. Use the Queue view.</p>';
+$("ca").innerHTML=low.length?low.map(function(i){var s=status(i);return'<div><span class="pill '+s+'">'+s+"</span> "+esc(i.n)+": "+i.s+" left (reorder at "+rop(i)+"), suggest ordering "+sugg(i)+"</div>"}).join("<br>"):'<p class="note">All items are above their reorder points.</p>';
+var m,c;
+if(source&&q==="busy"&&low.length){c="badb";m="<b>Rush heads-up:</b> the queue is busy and "+low.length+" item(s) are at or below reorder point ("+names+"). Prioritise these now."}
+else if(source&&q==="busy"){c="warnb";m="<b>Busy queue.</b> Stock is healthy, so focus on serving speed."}
+else if(low.length){c="warnb";m="<b>Restock soon:</b> "+names+". "+(source?"The queue is "+q+", so now is a good time to place orders.":"Run a queue scan to see if a rush is building.")}
+else{c="okb";m=source?"<b>All clear.</b> The queue is "+q+" and stock is healthy.":"<b>Stock is healthy.</b> No queue scan yet."}
+$("sum").innerHTML='<div class="alert" style="background:var(--'+c+')">'+m+"</div>"}
+
+function renderAll(){renderI();renderC();save()}
+function save(){try{localStorage.setItem("cf",JSON.stringify({items:items,logs:logs,rate:$("rate").value}))}catch(e){}}
+try{var s=JSON.parse(localStorage.getItem("cf")||"null");if(s&&Array.isArray(s.items)&&s.items.length){items=s.items;logs=s.logs||[];if(s.rate)$("rate").value=s.rate}}catch(e){}
+$("nav").addEventListener("click",function(e){var t=e.target.dataset.t;if(!t)return;
+["q","i","c"].forEach(function(x){$("t-"+x).classList.toggle("hide",x!==t)});
+[].forEach.call($("nav").children,function(b){b.classList.toggle("on",b.dataset.t===t)})});
+/* accounts */
+var role=null,name="",pick="student",LB={light:"Light queue",moderate:"Moderate queue",busy:"Busy queue"};
+function bad(m){return'<div class="alert" style="background:var(--badb);color:var(--bad)">'+m+"</div>"}
+function readSnap(){try{return JSON.parse(localStorage.getItem("cfq")||"null")}catch(e){return null}}
+function snap(){if(!source||!scanTime)return;try{localStorage.setItem("cfq",JSON.stringify({n:marks.length,r:rate(),src:source,t:scanTime.getTime()}))}catch(e){}}
+function loadItems(){try{var s=JSON.parse(localStorage.getItem("cf")||"null");if(s&&Array.isArray(s.items))items=s.items}catch(e){}}
+function ago(t){var m=Math.round((Date.now()-t)/60000);return m<1?"just now":m<60?m+" min ago":Math.round(m/60)+" h ago"}
+function avail(i){return i.s<=0?["Sold out","Critical"]:status(i)!=="OK"?["Running low","Reorder"]:["Available","OK"]}
+function renderS(){
+var s=readSnap(),h;
+if(!s)h='<p class="note">Staff have not posted a queue update yet. Check back soon.</p>';
+else{var q=qstat(s.n),w=Math.max(s.n?1:0,Math.round(s.n/s.r));
+h='<div class="stat">about '+w+' min</div><div class="note">estimated wait, '+s.n+' people in line</div><p><span class="pill '+q+'">'+LB[q]+'</span></p><div class="note">'+(q==="light"?"Good time to go.":q==="moderate"?"Expect a short wait.":"Busy now. Coming a bit later may help.")+'</div><div class="note">Updated '+ago(s.t)+(s.src==="sample"?" (demo data)":"")+"</div>";
+if(Date.now()-s.t>1800000)h+='<div class="alert" style="background:var(--warnb);color:var(--warn)">This update is over 30 minutes old. Treat it as a rough guide.</div>'}
+$("sq").innerHTML=h;
+$("menu").innerHTML=items.length?items.map(function(i){var a=avail(i);return'<div class="row"><span class="pill '+a[1]+'">'+a[0]+"</span> "+esc(i.n)+"</div>"}).join(""):'<p class="note">No items listed yet.</p>';
+var cur=$("sel").value;$("sel").innerHTML=items.map(function(i,k){return'<option value="'+k+'">'+esc(i.n)+"</option>"}).join("");
+if(cur!==""&&+cur<items.length)$("sel").value=cur;renderPlan()}
+function renderPlan(){var i=items[$("sel").value];if(!i){$("plan").innerHTML="";return}
+var a=avail(i),s=readSnap(),m=i.n+": "+a[0].toLowerCase()+".";
+if(a[1]==="Critical")m+=" Try another item or check back later.";else if(a[1]==="Reorder")m+=" Go soon, it may run out.";
+if(s)m+=" Current wait is about "+Math.round(s.n/s.r)+" min.";
+$("plan").innerHTML='<div class="alert" style="background:var(--'+(a[1]==="OK"?"okb":a[1]==="Reorder"?"warnb":"badb")+')">'+esc(m)+"</div>"}
+function refreshS(){loadItems();renderS()}
+function show(){
+$("login").classList.toggle("hide",!!role);$("stu").classList.toggle("hide",role!=="student");$("staff").classList.toggle("hide",role!=="staff");
+$("who").classList.toggle("hide",!role);$("whot").textContent=role?name+" ("+(role==="staff"?"staff":"student")+")":"";
+if(role==="student")refreshS();if(role==="staff"){renderI();renderC()}}
+$("login").addEventListener("click",function(e){var r=e.target.dataset.r;if(!r)return;pick=r;
+[].forEach.call(document.querySelectorAll(".roles .btn"),function(b){b.classList.toggle("on",b.dataset.r===r)});$("pinw").classList.toggle("hide",r!=="staff")});
+$("go").onclick=function(){var n=$("un").value.trim(),e=$("lerr");
+if(!n){e.innerHTML=bad("Enter your name.");return}
+if(pick==="staff"&&$("pin").value!=="1234"){e.innerHTML=bad("Incorrect staff PIN.");return}
+role=pick;name=n;e.innerHTML="";$("pin").value="";try{sessionStorage.setItem("cfu",JSON.stringify({role:role,name:name}))}catch(x){}show()};
+["un","pin"].forEach(function(id){$(id).addEventListener("keydown",function(e){if(e.key==="Enter")$("go").click()})});
+$("out").onclick=function(){role=null;name="";try{sessionStorage.removeItem("cfu")}catch(x){}show()};
+$("sref").onclick=refreshS;$("sel").addEventListener("change",renderPlan);
+setInterval(function(){if(role==="student")refreshS()},15000);
+try{var u=JSON.parse(sessionStorage.getItem("cfu")||"null");if(u&&(u.role==="student"||u.role==="staff")&&u.name){role=u.role;name=String(u.name)}}catch(x){}
+draw();renderI();renderC();show();
+})();
+</script></main></body></html>
